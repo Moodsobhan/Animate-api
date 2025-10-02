@@ -1,42 +1,56 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-
+const axios = require('axios');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const port = 6969;
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json()); // to parse JSON bodies
 
 // Root route
 app.get('/', (req, res) => {
-  res.json({ message: '🔥 My Animate API is running!' });
+  res.send("Hello World — My API is running!");
 });
 
-// Animate API
-app.post('/animate', (req, res) => {
-  const { character, action, style } = req.body;
+// Animate route (proxy to mj-proxy-pub)
+app.post('/animate', async (req, res) => {
+  try {
+    const { prompt, usePolling } = req.body;
 
-  // Validation
-  if (!character || !action) {
-    return res.status(400).json({ error: "Fields `character` and `action` are required" });
+    if (!prompt) {
+      return res.status(400).json({ error: "Field `prompt` is required" });
+    }
+
+    // Build URL
+    const baseUrl = 'https://dev.oculux.xyz/api/mj-proxy-pub';
+    const params = new URLSearchParams();
+    params.append('prompt', prompt);
+    if (usePolling !== undefined) {
+      // If user passed usePolling, use that; else default true
+      params.append('usePolling', usePolling.toString());
+    } else {
+      params.append('usePolling', 'true');
+    }
+
+    const targetUrl = `${baseUrl}?${params.toString()}`;
+
+    // You might need headers (if required by the external API)
+    const headers = {
+      'Content-Type': 'application/json',
+      // add any required authorization headers if needed
+    };
+
+    // Make the GET request
+    const externalResponse = await axios.get(targetUrl, { headers });
+
+    // Forward the data from external API
+    res.status(externalResponse.status).json(externalResponse.data);
+  } catch (err) {
+    console.error('Error in /animate:', err.response?.data || err.message);
+    const status = err.response?.status || 500;
+    const data = err.response?.data || { error: 'Internal server error' };
+    res.status(status).json(data);
   }
-
-  // Simulate making an animation (in real life you’d plug into AI or database)
-  const animationUrl = `https://myapi.fake/animations/${encodeURIComponent(character)}_${encodeURIComponent(action)}_${encodeURIComponent(style || "default")}.gif`;
-
-  // Response
-  res.json({
-    character,
-    action,
-    style: style || "default",
-    animation: animationUrl,
-    message: "✅ Animation generated successfully!"
-  });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server listening at http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`API is running at http://localhost:${port}`);
 });
