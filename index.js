@@ -1,8 +1,6 @@
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 10000;
-
-app.use(cors());
+const port = 6969;
 app.use(express.json());
 
 // Root route
