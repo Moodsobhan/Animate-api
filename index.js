@@ -1,43 +1,42 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
 // Root route
 app.get('/', (req, res) => {
-  res.json({ message: 'GoatBot Animate API Proxy is running 🚀' });
+  res.json({ message: '🔥 My Animate API is running!' });
 });
 
-// Animate route
-app.post('/animate', async (req, res) => {
-  try {
-    const { prompt, expandPrompt } = req.body;
-    if (!prompt) {
-      return res.status(400).json({ error: "Field `prompt` is required" });
-    }
+// Animate API
+app.post('/animate', (req, res) => {
+  const { character, action, style } = req.body;
 
-    const baseUrl = 'https://dev.oculux.xyz/api/hailuo01';
-    const params = new URLSearchParams();
-    params.append('prompt', prompt);
-    if (expandPrompt) params.append('expandPrompt', expandPrompt);
-
-    const targetUrl = `${baseUrl}?${params.toString()}`;
-
-    const response = await axios.get(targetUrl);
-
-    res.json(response.data);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: 'Something went wrong' });
+  // Validation
+  if (!character || !action) {
+    return res.status(400).json({ error: "Fields `character` and `action` are required" });
   }
+
+  // Simulate making an animation (in real life you’d plug into AI or database)
+  const animationUrl = `https://myapi.fake/animations/${encodeURIComponent(character)}_${encodeURIComponent(action)}_${encodeURIComponent(style || "default")}.gif`;
+
+  // Response
+  res.json({
+    character,
+    action,
+    style: style || "default",
+    animation: animationUrl,
+    message: "✅ Animation generated successfully!"
+  });
 });
 
+// Start server
 app.listen(PORT, () => {
-  console.log(`Server listening at http://localhost:${PORT}`);
+  console.log(`🚀 Server listening at http://localhost:${PORT}`);
 });
