@@ -1,29 +1,23 @@
 const express = require('express');
+const axios = require('axios');
 const app = express();
 const port = 6969;
 app.use(express.json());
 
 // Root route
 app.get('/', (req, res) => {
-  res.send("/animate?character=&action=");
+  res.send("Api is running");
 });
+app.get('/mj', (req, res) => {
+  const { prompt } = req.query;
 
-// Animate route (POST)
-app.get('/animate', (req, res) => {
-  const { character, action } = req.query;
-
-  if (!character || !action) {
-    return res.status(400).json({ error: "Please provide `character` and `action`" });
+  if (!prompt) {
+    return res.status(400).json({ error: "Please provide a prompt" });
   }
 
-  const animationUrl = `https://dev.oculux.xyz/api/mj-proxy-pub?prompt=`;
-
-  res.json({
-    character,
-    action,
-    animation: animationUrl,
-    message: "✅ Animation generated successfully!"
-  });
+  const u = `https://dev.oculux.xyz/api/mj-proxy-pub?prompt=${prompt}`;
+const r = await axios.get(u)
+res.send(r.data)
 });
 
 // Start server
