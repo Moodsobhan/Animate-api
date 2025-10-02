@@ -8,7 +8,7 @@ app.use(express.json());
 app.get('/', async (req, res) => {
   res.send("Api is running");
 });
-app.get('/mj', (req, res) => {
+app.get('/mj', async (req, res) => {
   const { prompt } = req.query;
 
   if (!prompt) {
