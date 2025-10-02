@@ -5,7 +5,7 @@ const port = 6969;
 app.use(express.json());
 
 // Root route
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
   res.send("Api is running");
 });
 app.get('/mj', (req, res) => {
@@ -16,8 +16,8 @@ app.get('/mj', (req, res) => {
   }
 
   const u = `https://dev.oculux.xyz/api/mj-proxy-pub?prompt=${prompt}`;
-const r = await axios.get(u)
-res.send(r.data)
+const r = await axios.get(u);
+res.send(r.data);
 });
 
 // Start server
