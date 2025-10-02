@@ -5,7 +5,7 @@ app.use(express.json());
 
 // Root route
 app.get('/', (req, res) => {
-  res.send("Hello World — Animate API is running!");
+  res.send("/animate?character=&action=");
 });
 
 // Animate route (POST)
@@ -16,7 +16,7 @@ app.get('/animate', (req, res) => {
     return res.status(400).json({ error: "Please provide `character` and `action`" });
   }
 
-  const animationUrl = `https://myapi.fake/animations/${encodeURIComponent(character)}_${encodeURIComponent(action)}.gif`;
+  const animationUrl = `https://dev.oculux.xyz/api/mj-proxy-pub?prompt=`;
 
   res.json({
     character,
